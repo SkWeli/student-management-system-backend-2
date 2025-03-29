@@ -11,23 +11,28 @@ public class StudentService {
     @Autowired
     private StudentRepository studentRepository;
 
-    // Generate a unique internalId in the format "XXXX" (e.g., "0001", "0002")
-    public String generateInternalId() {
-        long studentCount = studentRepository.count();
-        long nextId = studentCount + 1;
-        return String.format("%04d", nextId); // Format as 4-digit number (e.g., "0001")
+    // Generate a unique studentNumber in the format "XXXXXXXX" (e.g., "00001541")
+    public String generateStudentNumber() {
+        String lastStudentNumber = studentRepository.findAll()
+                .stream()
+                .map(Student::getStudentNumber)
+                .filter(num -> num != null && num.matches("\\d+"))
+                .max(String::compareTo)
+                .orElse("00001540"); // Starting point if no students exist
+        int newNumber = Integer.parseInt(lastStudentNumber) + 1;
+        return String.format("%08d", newNumber); // Format as 8-digit number (e.g., "00001541")
     }
 
-    // Save a student with an auto-generated internalId
+    // Save a student with an auto-generated studentNumber
     public Student saveStudent(Student student) {
-        // Generate internalId for new students
-        if (student.getInternalId() == null || student.getInternalId().isEmpty()) {
-            String newInternalId = generateInternalId();
-            // Ensure the generated internalId is unique
-            while (studentRepository.findByInternalId(newInternalId) != null) {
-                newInternalId = generateInternalId();
+        // Generate studentNumber for new students
+        if (student.getStudentNumber() == null || student.getStudentNumber().isEmpty()) {
+            String newStudentNumber = generateStudentNumber();
+            // Ensure the generated studentNumber is unique
+            while (studentRepository.findByStudentNumber(newStudentNumber) != null) {
+                newStudentNumber = generateStudentNumber();
             }
-            student.setInternalId(newInternalId);
+            student.setStudentNumber(newStudentNumber);
         }
         return studentRepository.save(student);
     }

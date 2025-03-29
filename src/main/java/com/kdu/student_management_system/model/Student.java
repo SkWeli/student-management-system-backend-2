@@ -6,73 +6,46 @@ import java.util.List;
 
 @Entity
 @Table(name = "students")
-
 public class Student {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "student_number", unique = true)
+    private String studentNumber;
 
-    @Column(nullable = false, unique = true)
-    private String studentId; // User-provided ID (e.g., "058644")
-
-    @Column(nullable = false, unique = true)
-    private String internalId; // Auto-generated ID (e.g., "0001", "0002")
-
-    @Column(nullable = false)
+    @Column(name = "first_name")
     private String firstName;
 
-    @Column(nullable = false)
+    @Column(name = "last_name")
     private String lastName;
 
-    @Column(nullable = false)
+    @Column(name = "current_address")
     private String currentAddress;
 
-    @Column(nullable = false)
+    @Column(name = "birthday")
     private LocalDate birthday;
 
-    @Column(nullable = false)
+    @Column(name = "id_number")
+    private String idNumber;
+
+    @Column(name = "degree")
     private String degree;
 
     @ElementCollection
-    private List<String> courses;
+    @CollectionTable(name = "student_courses", joinColumns = @JoinColumn(name = "student_number"))
+    @Column(name = "course")
+    private List<String> coursesEnrolled;
 
     // Constructors
-    public Student() {}
-
-    public Student(String studentId, String internalId, String firstName, String lastName, String currentAddress, LocalDate birthday, String degree, List<String> courses) {
-        this.studentId = studentId;
-        this.internalId = internalId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.currentAddress = currentAddress;
-        this.birthday = birthday;
-        this.degree = degree;
-        this.courses = courses;
+    public Student() {
     }
 
     // Getters and Setters
-    public Long getId() {
-        return id;
+    public String getStudentNumber() {
+        return studentNumber;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
-    }
-
-    public String getInternalId() {
-        return internalId;
-    }
-
-    public void setInternalId(String internalId) {
-        this.internalId = internalId; 
+    public void setStudentNumber(String studentNumber) {
+        this.studentNumber = studentNumber;
     }
 
     public String getFirstName() {
@@ -107,6 +80,14 @@ public class Student {
         this.birthday = birthday;
     }
 
+    public String getIdNumber() {
+        return idNumber;
+    }
+
+    public void setIdNumber(String idNumber) {
+        this.idNumber = idNumber;
+    }
+
     public String getDegree() {
         return degree;
     }
@@ -115,12 +96,11 @@ public class Student {
         this.degree = degree;
     }
 
-    public List<String> getCourses() {
-        return courses;
+    public List<String> getCoursesEnrolled() {
+        return coursesEnrolled;
     }
 
-    public void setCourses(List<String> courses) {
-        this.courses = courses;
+    public void setCoursesEnrolled(List<String> coursesEnrolled) {
+        this.coursesEnrolled = coursesEnrolled;
     }
-
 }
