@@ -3,6 +3,7 @@ package com.kdu.student_management_system.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "students")
@@ -36,6 +37,7 @@ public class Student {
     @ElementCollection
     @CollectionTable(name = "student_courses", joinColumns = @JoinColumn(name = "student_id"))
     @Column(name = "course")
+    @JsonIgnore // Ignore this field in JSON
     private List<String> coursesEnrolled;
 
     // Constructors

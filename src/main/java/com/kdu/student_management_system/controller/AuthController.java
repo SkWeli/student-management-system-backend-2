@@ -1,105 +1,49 @@
 package com.kdu.student_management_system.controller;
 
-import com.kdu.student_management_system.model.Admin;
-import com.kdu.student_management_system.repository.AdminRepository;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.kdu.student_management_system.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Value;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-
-
 public class AuthController {
 
     @Autowired
-    private AdminRepository adminRepository;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Value("${jwt.secret}")
-    private String SECRET_KEY;
-    
-    private final long EXPIRATION_TIME = 864_000_000; // 10 days in milliseconds
+    private JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest) {
-        // Find admin by email
-        Admin admin = adminRepository.findByEmail(loginRequest.getEmail());
-        if (admin == null) {
-            Map<String, String> response = new HashMap<>();
-            response.put("error", "Invalid email or password");
-            return ResponseEntity.status(401).body(response);
-        }
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+        );
 
-        // Verify password
-        if (!passwordEncoder.matches(loginRequest.getPassword(), admin.getPassword())) {
-            Map<String, String> response = new HashMap<>();
-            response.put("error", "Invalid email or password");
-            return ResponseEntity.status(401).body(response);
-        }
-
-        // Generate JWT token
-        String token = Jwts.builder()
-                .setSubject(loginRequest.getEmail())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
-                .compact();
-
-        // Return the token in the expected format
-        Map<String, String> response = new HashMap<>();
-        response.put("token", token);
-        return ResponseEntity.ok(response);
-    }
-
-    // For testing: Create a user (remove in production)
-    @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@RequestBody LoginRequest loginRequest) {
-        if (adminRepository.findByEmail(loginRequest.getEmail()) != null) {
-            Map<String, String> response = new HashMap<>();
-            response.put("error", "Email already exists");
-            return ResponseEntity.status(400).body(response);
-        }
-
-        Admin user = new Admin();
-        user.setEmail(loginRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(loginRequest.getPassword()));
-        adminRepository.save(user);
-
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "User registered successfully");
-        return ResponseEntity.ok(response);
+        String token = jwtTokenProvider.generateToken(authentication.getName());
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 }
 
 class LoginRequest {
-    private String email;
+    private String username;
     private String password;
 
-    // Getters and Setters
-    public String getEmail() {
-        return email;
-    }
+    // Getters and setters
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+class JwtResponse {
+    private String token;
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public JwtResponse(String token) { this.token = token; }
+    public String getToken() { return token; }
+    public void setToken(String token) { this.token = token; }
 }

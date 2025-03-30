@@ -79,7 +79,11 @@
 			<artifactId>jjwt</artifactId>
 			<version>0.9.1</version>
 		</dependency>
-
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<scope>provided</scope> <!-- Provided by the embedded Tomcat server -->
+		</dependency>
 	</dependencies>
 
 	<build>
