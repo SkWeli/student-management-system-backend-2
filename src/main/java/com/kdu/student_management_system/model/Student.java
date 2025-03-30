@@ -9,8 +9,11 @@ import java.util.List;
 public class Student {
 
     @Id
-    @Column(name = "student_number", unique = true)
-    private String studentNumber;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "student_id", unique = true)
+    private String studentId; // Renamed from studentNumber to represent "ID Number (student ID number)"
 
     @Column(name = "first_name")
     private String firstName;
@@ -31,7 +34,7 @@ public class Student {
     private String degree;
 
     @ElementCollection
-    @CollectionTable(name = "student_courses", joinColumns = @JoinColumn(name = "student_number"))
+    @CollectionTable(name = "student_courses", joinColumns = @JoinColumn(name = "student_id"))
     @Column(name = "course")
     private List<String> coursesEnrolled;
 
@@ -40,12 +43,20 @@ public class Student {
     }
 
     // Getters and Setters
-    public String getStudentNumber() {
-        return studentNumber;
+    public Long getId() {
+        return id;
     }
 
-    public void setStudentNumber(String studentNumber) {
-        this.studentNumber = studentNumber;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
     }
 
     public String getFirstName() {

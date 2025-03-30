@@ -5,35 +5,47 @@ import com.kdu.student_management_system.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class StudentService {
 
     @Autowired
     private StudentRepository studentRepository;
 
-    // Generate a unique studentNumber in the format "XXXXXXXX" (e.g., "00001541")
-    public String generateStudentNumber() {
-        String lastStudentNumber = studentRepository.findAll()
+    // Generate a unique studentId in the format "XXXXXX" (e.g., "054760")
+    public String generateStudentId() {
+        String lastStudentId = studentRepository.findAll()
                 .stream()
-                .map(Student::getStudentNumber)
-                .filter(num -> num != null && num.matches("\\d+"))
+                .map(Student::getStudentId)
+                .filter(id -> id != null && id.matches("\\d+"))
                 .max(String::compareTo)
-                .orElse("00001540"); // Starting point if no students exist
-        int newNumber = Integer.parseInt(lastStudentNumber) + 1;
-        return String.format("%08d", newNumber); // Format as 8-digit number (e.g., "00001541")
+                .orElse("054759"); // Starting point if no students exist (one less than 054760)
+        int newId = Integer.parseInt(lastStudentId) + 1;
+        return String.format("%06d", newId); // Format as 6-digit number (e.g., "054760")
     }
 
-    // Save a student with an auto-generated studentNumber
+    // Save a student with an auto-generated studentId if not provided
     public Student saveStudent(Student student) {
-        // Generate studentNumber for new students
-        if (student.getStudentNumber() == null || student.getStudentNumber().isEmpty()) {
-            String newStudentNumber = generateStudentNumber();
-            // Ensure the generated studentNumber is unique
-            while (studentRepository.findByStudentNumber(newStudentNumber) != null) {
-                newStudentNumber = generateStudentNumber();
+        // Generate studentId for new students if not provided
+        if (student.getStudentId() == null || student.getStudentId().isEmpty()) {
+            String newStudentId = generateStudentId();
+            // Ensure the generated studentId is unique
+            while (studentRepository.findByStudentId(newStudentId) != null) {
+                newStudentId = generateStudentId();
             }
-            student.setStudentNumber(newStudentNumber);
+            student.setStudentId(newStudentId);
         }
         return studentRepository.save(student);
+    }
+
+    // Fetch all students
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
+    }
+
+    // Fetch a student by studentId
+    public Student getStudentByStudentId(String studentId) {
+        return studentRepository.findByStudentId(studentId);
     }
 }
