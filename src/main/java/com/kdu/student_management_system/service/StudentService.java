@@ -48,4 +48,13 @@ public class StudentService {
     public Student getStudentByStudentId(String studentId) {
         return studentRepository.findByStudentId(studentId);
     }
+
+    
+    public Student getStudentById(Long id) {
+        return studentRepository.findById(id).orElse(null);
+    }
+
+    public void deleteStudent(Long id) {
+        studentRepository.deleteById(id);
+    }
 }
