@@ -6,16 +6,22 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+// Entity class representing admin users in the system
+// + Maps to 'admins' table in database
+// + Contains authentication and authorization fields
 @Entity
 @Table(name = "admins")
 public class Admin {
 
+    // Primary key with auto-increment
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // Changed to Long to match bigint
+    private Long id; 
 
-    private String email; // Changed from username to email
+    // Unique email identifier for admin
+    private String email; 
 
+    // Encrypted password
     private String password;
 
     private String role;
@@ -46,11 +52,11 @@ public class Admin {
     public void setEmail(String email) {
         this.email = email;
     }
-
+     // Getter for password (hashed)
     public String getPassword() {
         return password;
     }
-
+    // Setter for password (should be hashed before setting)
     public void setPassword(String password) {
         this.password = password;
     }

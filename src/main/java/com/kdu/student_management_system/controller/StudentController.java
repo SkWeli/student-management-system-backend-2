@@ -17,11 +17,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// Controller for handling all student-related operations
+// + Manages CRUD operations for student records
+// + Tracks admin actions through AdminLog
+// + Secured endpoints for student data management
 @RestController
 @RequestMapping("/api/students")
 public class StudentController {
 
-    
+    // Logger for tracking operations and errors
     private static final Logger logger = LoggerFactory.getLogger(StudentController.class);
 
     @Autowired
@@ -29,17 +33,23 @@ public class StudentController {
 
     @Autowired
     private AdminLogRepository adminLogRepository;
-
+    // Method to get current admin's email
     private String getAdminEmail() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return auth != null ? auth.getName() : "unknown_admin";
     }
 
+    // Get all students endpoint
+    // + Returns complete list of students
+    // + No request parameters needed
     @GetMapping
     public List<Student> getAllStudents() {
         return studentService.getAllStudents();
     }
 
+    // Get single student by ID endpoint
+    // + Returns 404 if student not found
+    // + Logs successful and failed attempts
     @GetMapping("/{id}")
     public ResponseEntity<Student> getStudentById(@PathVariable Long id) {
         try {
@@ -56,6 +66,10 @@ public class StudentController {
         }
     }
 
+    // Creates new student 
+    // + Handles duplicate student ID conflicts
+    // + Logs admin activity
+    // + Returns success/error messages
     @PostMapping
     public ResponseEntity<Map<String, String>> addStudent(@RequestBody Student student) {
         try {
@@ -83,6 +97,10 @@ public class StudentController {
         }
     }
 
+    // Update existing student (edit)
+    // + Requires complete student object
+    // + Validates student exists before update
+    // + Logs admin activity
     @PutMapping("/{id}")
     public ResponseEntity<Student> updateStudent(@PathVariable Long id, @RequestBody Student updatedStudent) {
         Student existingStudent = studentService.getStudentById(id);
@@ -115,6 +133,9 @@ public class StudentController {
         }
     }
 
+    // Delete student 
+    // + Returns 204 No Content on success
+    // + Logs admin activity
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
         Student existingStudent = studentService.getStudentById(id);

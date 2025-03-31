@@ -8,6 +8,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+// Controller for handling authentication requests
+// + Exposes endpoints under /api/auth base path
+// + Handles JWT token generation for authenticated users
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -23,8 +26,9 @@ public class AuthController {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
         );
-
+        // Generate JWT token
         String token = jwtTokenProvider.generateToken(authentication.getName());
+        // Return token in response
         return ResponseEntity.ok(new JwtResponse(token));
     }
 }
@@ -39,10 +43,11 @@ class LoginRequest {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 }
-
+// DTO for JWT token response
+// + Wraps the generated token string
 class JwtResponse {
     private String token;
-
+    // Constructor and accessors
     public JwtResponse(String token) { this.token = token; }
     public String getToken() { return token; }
     public void setToken(String token) { this.token = token; }

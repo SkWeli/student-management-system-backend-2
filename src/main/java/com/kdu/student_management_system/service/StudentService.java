@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Service layer for student-related methods
+ * Handles logic for student management
+ */
 @Service
 public class StudentService {
 
@@ -49,11 +53,12 @@ public class StudentService {
         return studentRepository.findByStudentId(studentId);
     }
 
-    
+    // Fetch a student by database primary key
     public Student getStudentById(Long id) {
         return studentRepository.findById(id).orElse(null);
     }
 
+    // Deletes student by database primary key
     public void deleteStudent(Long id) {
         studentRepository.deleteById(id);
     }

@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
+
+// Repository interface for Admin entity
 public interface AdminRepository extends JpaRepository<Admin, Long> {
     Optional<Admin> findByEmail(String email); // Changed from findByUsername
 }

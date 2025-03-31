@@ -6,16 +6,33 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+/**
+ * JWT Token Provider - Handles JWT token creation, validation, and parsing
+ * 
+ * + Generates signed JWT tokens
+ * + Validates token integrity and expiration
+ * + Extracts claims (like username) from tokens
+ */
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret}") // Define in application.properties (e.g., jwt.secret=yourSecretKeyHere)
+    // Secret key for signing tokens (inserted from properties)
+    @Value("${jwt.secret}") 
     private String jwtSecret;
 
-    @Value("${jwt.expiration}") // e.g., jwt.expiration=86400000 (24 hours in milliseconds)
+    // Token expiration time in milliseconds(inserted from properties)
+    @Value("${jwt.expiration}") 
     private long jwtExpiration;
 
-    // Generate a token (call this during login)
+    /**
+     * Generates a new JWT token for authenticated users
+     * 
+     * Token Contents:
+     * + Subject (username)
+     * + Issued at timestamp
+     * + Expiration timestamp
+     * + Signed with HS512 algorithm
+     */
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
@@ -25,7 +42,14 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // Validate a token
+    /**
+     * Validates a JWT token's integrity and expiration
+     * 
+     * Checks Performed:
+     * + Signature verification
+     * + Token expiration
+     * + Proper token structure
+     */
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
@@ -41,6 +65,6 @@ public class JwtTokenProvider {
                 .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.getSubject();
+        return claims.getSubject(); // Returns the username
     }
 }

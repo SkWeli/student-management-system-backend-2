@@ -5,17 +5,22 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+// Entity class representing student records
+// + Maps to 'students' table in database
+// + Contains all student academic and personal information
 
 @Entity
 @Table(name = "students")
 public class Student {
 
+    // Primary key with auto-increment
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Unique student identifier
     @Column(name = "student_id", unique = true)
-    private String studentId; // Renamed from studentNumber to represent "ID Number (student ID number)"
+    private String studentId; 
 
     @Column(name = "first_name")
     private String firstName;
@@ -41,6 +46,9 @@ public class Student {
     @Column(name = "semester", nullable = false) 
     private Integer semester;
 
+    // List of enrolled courses
+    // + Stored in separate table 'student_courses'
+    // + Eagerly fetched with student data
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "student_courses", joinColumns = @JoinColumn(name = "student_id"))
     @Column(name = "course")
