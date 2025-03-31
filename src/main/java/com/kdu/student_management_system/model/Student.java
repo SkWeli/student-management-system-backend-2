@@ -2,6 +2,7 @@ package com.kdu.student_management_system.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -34,11 +35,10 @@ public class Student {
     @Column(name = "degree")
     private String degree;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "student_courses", joinColumns = @JoinColumn(name = "student_id"))
     @Column(name = "course")
-    @JsonIgnore // Ignore this field in JSON
-    private List<String> coursesEnrolled;
+    private List<String> coursesEnrolled = new ArrayList<>();
 
     // Constructors
     public Student() {
@@ -109,11 +109,12 @@ public class Student {
         this.degree = degree;
     }
 
+    // Custom getter for serialization
     public List<String> getCoursesEnrolled() {
-        return coursesEnrolled;
+        return coursesEnrolled != null ? new ArrayList<>(coursesEnrolled) : new ArrayList<>();
     }
 
     public void setCoursesEnrolled(List<String> coursesEnrolled) {
-        this.coursesEnrolled = coursesEnrolled;
+        this.coursesEnrolled = coursesEnrolled != null ? new ArrayList<>(coursesEnrolled) : new ArrayList<>();
     }
 }

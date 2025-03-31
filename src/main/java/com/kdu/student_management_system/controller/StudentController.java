@@ -2,6 +2,8 @@ package com.kdu.student_management_system.controller;
 
 import com.kdu.student_management_system.model.Student;
 import com.kdu.student_management_system.service.StudentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,30 +16,32 @@ import java.util.Map;
 @RequestMapping("/api/students")
 public class StudentController {
 
+    private static final Logger logger = LoggerFactory.getLogger(StudentController.class);
+
     @Autowired
     private StudentService studentService;
 
-    // Fetch all students
     @GetMapping
     public List<Student> getAllStudents() {
         return studentService.getAllStudents();
     }
 
-    // Fetch a student by id
     @GetMapping("/{id}")
     public ResponseEntity<Student> getStudentById(@PathVariable Long id) {
-        Student student = studentService.getAllStudents()
-                .stream()
-                .filter(s -> s.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-        if (student == null) {
-            return ResponseEntity.notFound().build();
+        try {
+            Student student = studentService.getStudentById(id);
+            if (student == null) {
+                logger.warn("Student not found for id: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+            logger.info("Returning student: {}", student);
+            return ResponseEntity.ok(student);
+        } catch (Exception e) {
+            logger.error("Error fetching student with id {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(500).build();
         }
-        return ResponseEntity.ok(student);
     }
 
-    // Add a new student
     @PostMapping
     public ResponseEntity<Map<String, String>> addStudent(@RequestBody Student student) {
         try {
@@ -46,20 +50,19 @@ public class StudentController {
             response.put("message", "Student added successfully");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            logger.error("Error adding student: {}", e.getMessage(), e);
             Map<String, String> response = new HashMap<>();
             response.put("error", "Failed to add student: " + e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }
     }
 
-    // Update a student
     @PutMapping("/{id}")
     public ResponseEntity<Student> updateStudent(@PathVariable Long id, @RequestBody Student updatedStudent) {
         Student existingStudent = studentService.getStudentById(id);
         if (existingStudent == null) {
             return ResponseEntity.notFound().build();
         }
-        // Update fields
         existingStudent.setFirstName(updatedStudent.getFirstName());
         existingStudent.setLastName(updatedStudent.getLastName());
         existingStudent.setCurrentAddress(updatedStudent.getCurrentAddress());
@@ -73,10 +76,11 @@ public class StudentController {
             studentService.saveStudent(existingStudent);
             return ResponseEntity.ok(existingStudent);
         } catch (Exception e) {
+            logger.error("Error updating student: {}", e.getMessage(), e);
             return ResponseEntity.badRequest().build();
         }
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
         Student existingStudent = studentService.getStudentById(id);
@@ -84,6 +88,6 @@ public class StudentController {
             return ResponseEntity.notFound().build();
         }
         studentService.deleteStudent(id);
-        return ResponseEntity.noContent().build(); // 204 No Content on success
+        return ResponseEntity.noContent().build();
     }
 }
