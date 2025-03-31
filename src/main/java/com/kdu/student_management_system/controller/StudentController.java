@@ -1,12 +1,17 @@
 package com.kdu.student_management_system.controller;
 
 import com.kdu.student_management_system.model.Student;
+import com.kdu.student_management_system.model.AdminLog;
+import com.kdu.student_management_system.repository.AdminLogRepository;
 import com.kdu.student_management_system.service.StudentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,10 +21,19 @@ import java.util.Map;
 @RequestMapping("/api/students")
 public class StudentController {
 
+    
     private static final Logger logger = LoggerFactory.getLogger(StudentController.class);
 
     @Autowired
     private StudentService studentService;
+
+    @Autowired
+    private AdminLogRepository adminLogRepository;
+
+    private String getAdminEmail() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null ? auth.getName() : "unknown_admin";
+    }
 
     @GetMapping
     public List<Student> getAllStudents() {
@@ -48,7 +62,19 @@ public class StudentController {
             studentService.saveStudent(student);
             Map<String, String> response = new HashMap<>();
             response.put("message", "Student added successfully");
+            logger.info("Added student: {}", student);
+
+            String adminEmail = getAdminEmail();
+            AdminLog log = new AdminLog(adminEmail, "ADD_STUDENT", student.getStudentId(), "Added student: " + student.getFirstName() + " " + student.getLastName());
+            adminLogRepository.save(log);
+
             return ResponseEntity.ok(response);
+
+        } catch (DataIntegrityViolationException e) {
+            logger.error("Duplicate student_id: {}", student.getStudentId(), e);
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Student ID '" + student.getStudentId() + "' is already registered.");
+            return ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
             logger.error("Error adding student: {}", e.getMessage(), e);
             Map<String, String> response = new HashMap<>();
@@ -74,6 +100,12 @@ public class StudentController {
 
         try {
             studentService.saveStudent(existingStudent);
+            logger.info("Updated student: {}", existingStudent);
+
+            String adminEmail = getAdminEmail();
+            AdminLog log = new AdminLog(adminEmail, "EDIT_STUDENT", existingStudent.getStudentId(), "Edited student details");
+            adminLogRepository.save(log);
+
             return ResponseEntity.ok(existingStudent);
         } catch (Exception e) {
             logger.error("Error updating student: {}", e.getMessage(), e);
@@ -88,6 +120,13 @@ public class StudentController {
             return ResponseEntity.notFound().build();
         }
         studentService.deleteStudent(id);
+        logger.info("Deleted student with id: {}", id);
+
+        // Log admin action
+        String adminEmail = getAdminEmail();
+        AdminLog log = new AdminLog(adminEmail, "DELETE_STUDENT", existingStudent.getStudentId(), "Deleted student: " + existingStudent.getFirstName() + " " + existingStudent.getLastName());
+        adminLogRepository.save(log);
+
         return ResponseEntity.noContent().build();
     }
 }

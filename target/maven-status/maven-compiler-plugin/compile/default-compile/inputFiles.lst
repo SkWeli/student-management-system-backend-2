@@ -2,7 +2,9 @@ C:\Users\senud\SMS\student-management-system\student-management-system\src\main\
 C:\Users\senud\SMS\student-management-system\student-management-system\src\main\java\com\kdu\student_management_system\controller\AuthController.java
 C:\Users\senud\SMS\student-management-system\student-management-system\src\main\java\com\kdu\student_management_system\controller\StudentController.java
 C:\Users\senud\SMS\student-management-system\student-management-system\src\main\java\com\kdu\student_management_system\model\Admin.java
+C:\Users\senud\SMS\student-management-system\student-management-system\src\main\java\com\kdu\student_management_system\model\AdminLog.java
 C:\Users\senud\SMS\student-management-system\student-management-system\src\main\java\com\kdu\student_management_system\model\Student.java
+C:\Users\senud\SMS\student-management-system\student-management-system\src\main\java\com\kdu\student_management_system\repository\AdminLogRepository.java
 C:\Users\senud\SMS\student-management-system\student-management-system\src\main\java\com\kdu\student_management_system\repository\AdminRepository.java
 C:\Users\senud\SMS\student-management-system\student-management-system\src\main\java\com\kdu\student_management_system\repository\StudentRepository.java
 C:\Users\senud\SMS\student-management-system\student-management-system\src\main\java\com\kdu\student_management_system\security\JwtAuthenticationFilter.java
