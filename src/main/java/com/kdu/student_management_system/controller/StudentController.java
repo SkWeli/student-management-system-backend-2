@@ -40,22 +40,41 @@ public class StudentController {
     // Add a new student
     @PostMapping
     public ResponseEntity<Map<String, String>> addStudent(@RequestBody Student student) {
-        studentService.saveStudent(student);
-
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Student added successfully");
-        return ResponseEntity.ok(response);
+        try {
+            studentService.saveStudent(student);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Student added successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Failed to add student: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
+    // Update a student
     @PutMapping("/{id}")
     public ResponseEntity<Student> updateStudent(@PathVariable Long id, @RequestBody Student updatedStudent) {
         Student existingStudent = studentService.getStudentById(id);
         if (existingStudent == null) {
             return ResponseEntity.notFound().build();
         }
-        updatedStudent.setId(id); // Ensure ID is preserved
-        studentService.saveStudent(updatedStudent);
-        return ResponseEntity.ok(updatedStudent);
+        // Update fields
+        existingStudent.setFirstName(updatedStudent.getFirstName());
+        existingStudent.setLastName(updatedStudent.getLastName());
+        existingStudent.setCurrentAddress(updatedStudent.getCurrentAddress());
+        existingStudent.setBirthday(updatedStudent.getBirthday());
+        existingStudent.setIdNumber(updatedStudent.getIdNumber());
+        existingStudent.setDegree(updatedStudent.getDegree());
+        existingStudent.setStudentId(updatedStudent.getStudentId());
+        existingStudent.setCoursesEnrolled(updatedStudent.getCoursesEnrolled());
+
+        try {
+            studentService.saveStudent(existingStudent);
+            return ResponseEntity.ok(existingStudent);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
     
     @DeleteMapping("/{id}")

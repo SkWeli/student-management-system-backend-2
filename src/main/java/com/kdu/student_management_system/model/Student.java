@@ -26,7 +26,7 @@ public class Student {
     private String currentAddress;
 
     @Column(name = "birthday")
-    private LocalDate birthday;
+    private String birthday;
 
     @Column(name = "id_number")
     private String idNumber;
@@ -85,11 +85,11 @@ public class Student {
         this.currentAddress = currentAddress;
     }
 
-    public LocalDate getBirthday() {
+    public String getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(LocalDate birthday) {
+    public void setBirthday(String birthday) {
         this.birthday = birthday;
     }
 
