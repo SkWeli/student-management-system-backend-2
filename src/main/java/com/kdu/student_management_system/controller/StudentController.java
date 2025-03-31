@@ -96,6 +96,8 @@ public class StudentController {
         existingStudent.setIdNumber(updatedStudent.getIdNumber());
         existingStudent.setDegree(updatedStudent.getDegree());
         existingStudent.setStudentId(updatedStudent.getStudentId());
+        existingStudent.setYear(updatedStudent.getYear());
+        existingStudent.setSemester(updatedStudent.getSemester());
         existingStudent.setCoursesEnrolled(updatedStudent.getCoursesEnrolled());
 
         try {

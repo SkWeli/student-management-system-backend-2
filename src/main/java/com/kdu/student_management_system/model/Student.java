@@ -35,6 +35,12 @@ public class Student {
     @Column(name = "degree")
     private String degree;
 
+    @Column(name = "year", nullable = false) 
+    private Integer year;
+
+    @Column(name = "semester", nullable = false) 
+    private Integer semester;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "student_courses", joinColumns = @JoinColumn(name = "student_id"))
     @Column(name = "course")
@@ -107,6 +113,22 @@ public class Student {
 
     public void setDegree(String degree) {
         this.degree = degree;
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    public Integer getSemester() {
+        return semester;
+    }
+
+    public void setSemester(Integer semester) {
+        this.semester = semester;
     }
 
     // Custom getter for serialization
